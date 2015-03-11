@@ -5,7 +5,6 @@ var MainCamera: GameObject;
 var Meteor: GameObject[];
 var bonus: GameObject;
 var particle_system: GameObject;
-var sensitivity = 1;
 
 private var Timer: float = 0;
 private var r_x = 0F;
@@ -13,6 +12,7 @@ private var r_y = 0F;
 private	var rb : Rigidbody;
 private	var hit = false;
 private	var points = 0;
+private	var Maxpoints = 0;
 private var tulr = Mathf.Infinity;//TimeUntilLevelReload
 private	var GodMode = false;
 private var GodModeProgress = 0;
@@ -21,6 +21,7 @@ private var CheatDelay = 0f;
 
 function Start() {
 	rb = this.GetComponent(Rigidbody);
+  Maxpoints = PlayerPrefs.GetInt("Score");
 }
 
 function Update() {
@@ -29,19 +30,25 @@ function Update() {
 	if (!hit) {
   	points += Time.deltaTime * 100;
 		//this.transform.position += transform.TransformDirection(Vector3.forward * moveSpeed);
-		r_x += Input.GetAxis("Horizontal") * sensitivity;
-		r_y += Input.GetAxis("Vertical") * sensitivity;
+		r_x += Input.GetAxis("Horizontal") * 25;
+		r_y += Input.GetAxis("Vertical") * 25;
 		this.transform.position = Vector3(r_x, r_y, 0);
 		if (Time.time > Timer) {
 			Timer = Time.time + Random.Range(0.2, 0.7);
-			generateMeteorField(Random.Range(25, 50));
+			generateMeteorField(Random.Range(100, 150));
 		}
 	}
-	if (Time.time > tulr) {
+	if (Time.realtimeSinceStartup > tulr) {
+  	Time.timeScale = 1;
 		Application.LoadLevel(Application.loadedLevel);
 	}
-  if (Input.GetKeyDown ("="))
+	if (points > Maxpoints)
+  	Maxpoints = points;
+  if (Input.GetKeyDown ("=")){
+  	Maxpoints = 0;
+		print("Score cleaned");
 		PlayerPrefs.SetInt("Score", 0);
+	}
 }
 
 function OnCollisionEnter(collision: Collision) {
@@ -59,6 +66,8 @@ function OnCollisionEnter(collision: Collision) {
 }
 
 function kill() {
+	if (PlayerPrefs.GetInt("Score") < Maxpoints)
+		PlayerPrefs.SetInt("Score", Maxpoints);
 	//Application.LoadLevel(Application.loadedLevel);
 	var Meteors = GameObject.FindGameObjectsWithTag("Meteor");
 	Meteors += GameObject.FindGameObjectsWithTag("World");
@@ -70,31 +79,32 @@ function kill() {
 	this.transform.DetachChildren();
 	MainCamera.transform.position = Vector3(this.transform.position.x - 150, this.transform.position.y, this.transform.position.z - 150);
 	MainCamera.transform.localEulerAngles.y = 30;
-	tulr = Time.time + 3;
-	if (PlayerPrefs.GetInt("Score") < points)
-		PlayerPrefs.SetInt("Score", points);
+	tulr = Time.realtimeSinceStartup + 3;
+  Time.timeScale = 0;
 }
 
 function generateMeteorField(amount: int) {
 	for (var i = 0; i <= amount; i++) {
-		var rans = Random.insideUnitSphere * 6000;
+		var rans = Random.insideUnitSphere * 20000;
 		var clone: GameObject;
-		clone = Instantiate(Meteor[Random.Range(0, Meteor.length)], Vector3(rans.x + r_x, rans.y + r_y, rans.z + 10000), Random.rotation);
-		clone.GetComponent(Rigidbody).velocity = Vector3(-rans.x / 6, -rans.y / 6, -3000);
-		Destroy(clone, 8);
+		clone = Instantiate(Meteor[Random.Range(0, Meteor.length)], Vector3(rans.x + r_x, rans.y + r_y, rans.z + 30000), Random.rotation);
+		clone.GetComponent(Rigidbody).velocity = Vector3(-rans.x / 5.5, -rans.y / 5.5, -10000);
+		var rs = Random.Range(90, 150);
+    clone.transform.localScale = Vector3(rs,rs,rs);
+		Destroy(clone, 6);
 	}
 	var ransb = Random.insideUnitSphere * 3000;
 	var cloneb: GameObject;
-	cloneb = Instantiate(bonus, Vector3(ransb.x + r_x, ransb.y + r_y, ransb.z + 10000), Random.rotation);
-	cloneb.GetComponent(Rigidbody).velocity = Vector3(-ransb.x / 6, -ransb.y / 6, -3000);
-	Destroy(cloneb, 8);
+	cloneb = Instantiate(bonus, Vector3(ransb.x + r_x, ransb.y + r_y, ransb.z + 30000), Random.rotation);
+	cloneb.GetComponent(Rigidbody).velocity = Vector3(-ransb.x / 5.5, -ransb.y / 5.5, -10000);
+	Destroy(cloneb, 6);
 }
 
 function OnGUI() {
 	if (hit) {
-		GUI.Box(Rect(Screen.width / 2 - 100, Screen.height / 2 - 15, 200, 100), "Score: " + points + "\n max: " + PlayerPrefs.GetInt("Score"));
+		GUI.Box(Rect(Screen.width / 2 - 100, Screen.height / 2 - 15, 200, 100), "Score: " + points + "\n max: " + Maxpoints);
 	} else {
-		GUI.Box(Rect(10, 10, 100, 90), "" + points);
+		GUI.Box(Rect(10, 10, 100, 90), points+"\n"+Maxpoints);
 	}
 }
 

@@ -12,7 +12,7 @@ function Update() {
 	if (move) {
 		this.transform.position.z -= Time.deltaTime / 10;
 		var dist = Vector3.Distance(this.transform.position, DistanceObject.transform.position);
-		if (dist < 0.51) {
+		if (dist < 0.6) {
 			print("Win!");
       m.SendMessage("kill");
 			//Application.LoadLevel(Application.loadedLevel);
