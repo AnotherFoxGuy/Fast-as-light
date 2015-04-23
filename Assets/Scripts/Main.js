@@ -1,3 +1,32 @@
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This file is part of Fast-as-light
+
+Copyright (c) 2015 AnotherFoxGuy
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+@file Main.js
+@author AnotherFoxGuy
+@date: 3/2015
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
 #pragma strict
 
 var moveSpeed = 1;
@@ -5,6 +34,7 @@ var MainCamera: GameObject;
 var Meteor: GameObject[];
 var bonus: GameObject;
 var particle_system: GameObject;
+var GodMode = false;
 
 private var Timer: float = 0;
 private var r_x = 0F;
@@ -14,38 +44,36 @@ private	var hit = false;
 private	var points = 0;
 private	var Maxpoints = 0;
 private var tulr = Mathf.Infinity;//TimeUntilLevelReload
-private	var GodMode = false;
+
 private var GodModeProgress = 0;
 private var CheatDelay = 0f;
 
-
 function Start() {
 	rb = this.GetComponent(Rigidbody);
-  Maxpoints = PlayerPrefs.GetInt("Score");
+	Maxpoints = PlayerPrefs.GetInt("Score");
 }
 
 function Update() {
 	UpdateCheats();
-
 	if (!hit) {
-  	points += Time.deltaTime * 100;
+		points += Time.deltaTime * 100;
 		//this.transform.position += transform.TransformDirection(Vector3.forward * moveSpeed);
 		r_x += Input.GetAxis("Horizontal") * 25;
 		r_y += Input.GetAxis("Vertical") * 25;
 		this.transform.position = Vector3(r_x, r_y, 0);
 		if (Time.time > Timer) {
 			Timer = Time.time + Random.Range(0.2, 0.7);
-			generateMeteorField(Random.Range(100, 150));
+			generateMeteorField(Random.Range(75, 100));
 		}
 	}
 	if (Time.realtimeSinceStartup > tulr) {
-  	Time.timeScale = 1;
+		Time.timeScale = 1;
 		Application.LoadLevel(Application.loadedLevel);
 	}
 	if (points > Maxpoints)
-  	Maxpoints = points;
-  if (Input.GetKeyDown ("=")){
-  	Maxpoints = 0;
+		Maxpoints = points;
+	if (Input.GetKeyDown("=")) {
+		Maxpoints = 0;
 		print("Score cleaned");
 		PlayerPrefs.SetInt("Score", 0);
 	}
@@ -57,7 +85,7 @@ function OnCollisionEnter(collision: Collision) {
 			for (var contact: ContactPoint in collision.contacts) {
 				Instantiate(particle_system, contact.point, Random.rotation);
 			}
-      kill();
+			kill();
 		} else {
 			Destroy(collision.gameObject);
 			points += 5000;
@@ -80,7 +108,7 @@ function kill() {
 	MainCamera.transform.position = Vector3(this.transform.position.x - 150, this.transform.position.y, this.transform.position.z - 150);
 	MainCamera.transform.localEulerAngles.y = 30;
 	tulr = Time.realtimeSinceStartup + 3;
-  Time.timeScale = 0;
+	Time.timeScale = 0;
 }
 
 function generateMeteorField(amount: int) {
@@ -88,15 +116,15 @@ function generateMeteorField(amount: int) {
 		var rans = Random.insideUnitSphere * 20000;
 		var clone: GameObject;
 		clone = Instantiate(Meteor[Random.Range(0, Meteor.length)], Vector3(rans.x + r_x, rans.y + r_y, rans.z + 30000), Random.rotation);
-		clone.GetComponent(Rigidbody).velocity = Vector3(-rans.x / 5.5, -rans.y / 5.5, -10000);
+		clone.GetComponent(Rigidbody).velocity = Vector3(-rans.x / Random.Range(5.0, 7.0), -rans.y / Random.Range(5.0, 7.0), -10000);
 		var rs = Random.Range(90, 150);
-    clone.transform.localScale = Vector3(rs,rs,rs);
+		clone.transform.localScale = Vector3(rs, rs, rs);
 		Destroy(clone, 6);
 	}
 	var ransb = Random.insideUnitSphere * 3000;
 	var cloneb: GameObject;
 	cloneb = Instantiate(bonus, Vector3(ransb.x + r_x, ransb.y + r_y, ransb.z + 30000), Random.rotation);
-	cloneb.GetComponent(Rigidbody).velocity = Vector3(-ransb.x / 5.5, -ransb.y / 5.5, -10000);
+	cloneb.GetComponent(Rigidbody).velocity = Vector3(-ransb.x / 6, -ransb.y / 6, -10000);
 	Destroy(cloneb, 6);
 }
 
@@ -104,7 +132,7 @@ function OnGUI() {
 	if (hit) {
 		GUI.Box(Rect(Screen.width / 2 - 100, Screen.height / 2 - 15, 200, 100), "Score: " + points + "\n max: " + Maxpoints);
 	} else {
-		GUI.Box(Rect(10, 10, 100, 90), points+"\n"+Maxpoints);
+		GUI.Box(Rect(10, 10, 100, 90), points + "\n" + Maxpoints);
 	}
 }
 
