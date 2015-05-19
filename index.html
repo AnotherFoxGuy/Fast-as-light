@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>Unity Web Player | FastAsLight</title>
+		<title>Unity Web Player | Fast-as-light</title>
 		<script type='text/javascript' src='https://ssl-webplayer.unity3d.com/download_webplayer-3.x/3.0/uo/jquery.min.js'></script>
 		<script type="text/javascript">
 		<!--
@@ -14,12 +14,13 @@
 		</script>
 		<script type="text/javascript">
 		<!--
-			var config = {
-				width: $(document).width()/1.5, 
-				height: $(document).height()/1.5,
-				params: { enableDebugging:"0" }
-				
+			var config;
+			config = {
+				width: $(window).width()/1.01,
+				height: $(window).height()/1.1,
+				params: {enableDebugging: "0"}
 			};
+			config.params["disableContextMenu"] = true;
 			var u = new UnityObject2(config);
 			
 			jQuery(function() {
@@ -85,7 +86,7 @@
 		}
 		div.content {
 			margin: auto;
-			width: 1280px;
+			width: 100%;
 		}
 		div.broken,
 		div.missing {
@@ -109,14 +110,14 @@
 		}
 		div#unityPlayer {
 			cursor: default;
-			height: 720px;
-			width: 1280px;
+			height: 100%;
+			width: 100%;
 		}
 		-->
 		</style>
 	</head>
 	<body>
-		<p class="header"><span>Unity Web Player | </span>FastAsLight</p>
+		<p class="header"><span>Unity Web Player | </span>Fast-as-light</p>
 		<div class="content">
 			<div id="unityPlayer">
 				<div class="missing">
