@@ -1,2 +1,2 @@
 # Fast-as-light
-A game
+A Fastpaced flying game.
